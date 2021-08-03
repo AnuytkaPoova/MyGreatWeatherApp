@@ -1,13 +1,10 @@
 package com.a_ches.mygreatweatherapp.view
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.Toast
+
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
-import com.a_ches.mygreatweatherapp.model.repository.getRepository
-import com.a_ches.mygreatweatherapp.R
 import com.a_ches.mygreatweatherapp.databinding.MainActivityBinding
+
 
 class MainActivity : AppCompatActivity() {
 

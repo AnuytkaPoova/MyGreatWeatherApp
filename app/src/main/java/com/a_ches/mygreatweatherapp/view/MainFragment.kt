@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.a_ches.mygreatweatherapp.R
+import com.a_ches.mygreatweatherapp.databinding.MainFragmentBinding
 import com.a_ches.mygreatweatherapp.model.AppState
 import com.a_ches.mygreatweatherapp.model.data.Weather
 import com.a_ches.mygreatweatherapp.viewmodel.MainViewModel
