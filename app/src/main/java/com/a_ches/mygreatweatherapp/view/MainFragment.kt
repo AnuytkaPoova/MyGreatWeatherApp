@@ -20,10 +20,14 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProvider(this).get(MainViewModel::class.java)
+    }
     private var _binding: MainFragmentBinding? = null
     private val binding
         get() = _binding!!
+    private val adapter = MainFragmentAdapter()
+    private var isDataSetRus: Boolean = true
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -33,54 +37,56 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        adapter.setOnItemViewClickListener { weather ->
+            activity?.supportFragmentManager?.apply {
+                beginTransaction()
+                        .add(R.id.container, DetailsFragment.newInstance(Bundle().apply {
+                            putParcelable(DetailsFragment.BUNDLE_EXTRA, weather)
+                        }))
+                        .addToBackStack("")
+                        .commitAllowingStateLoss()
+            }
+        }
+
+        binding.mainFragmentRecyclerView.adapter = adapter
+        binding.mainFragmentFAB.setOnClickListener {
+            changeWeatherDataSet()
+        }
         val observer = Observer<AppState> { a ->
             renderData(a)
         }
         viewModel.getData().observe(viewLifecycleOwner, observer)
-        viewModel.getWeatherFromRemoteSource()
+        viewModel.getWeatherFromLocalSourceWorld()
+    }
+
+    private fun changeWeatherDataSet() {
+        if (isDataSetRus) {
+            viewModel.getWeatherFromLocalSourceRus()
+            binding.mainFragmentFAB.setImageResource(R.drawable.ic_earth)
+        } else {
+            viewModel.getWeatherFromLocalSourceWorld()
+            binding.mainFragmentFAB.setImageResource(R.drawable.ic_russia)
+        }
+        isDataSetRus = !isDataSetRus
     }
 
     private fun renderData(data: AppState) {
         when (data) {
             is AppState.Success -> {
-                val weatherData = data.weatherData
-                binding.loadingLayout.visibility = View.GONE
-                populateData(weatherData)
+                binding.loadingLayout.hide()
+                adapter.setWeather(data.weatherData)
             }
             is AppState.Loading -> {
-                binding.loadingLayout.visibility = View.VISIBLE
+                binding.loadingLayout.show()
             }
             is AppState.Error -> {
-                binding.loadingLayout.visibility = View.GONE
-                Snackbar.make(binding.main, "Error", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Reload") { viewModel.getWeatherFromRemoteSource() }
-                        .show()
+                binding.loadingLayout.hide()
+                binding.mainFragmentFAB.showSnackBar("Error", "Reload") {
+                    if (isDataSetRus) viewModel.getWeatherFromLocalSourceRus()
+                    else viewModel.getWeatherFromLocalSourceWorld()
+                }
             }
         }
     }
-
-    private fun populateData(weatherData: Weather) {
-        with(binding) {
-            cityName.text = weatherData.city.city
-            cityCoordinates.text = String.format(
-                    getString(R.string.city_coordinates),
-                    weatherData.city.lat.toString(),
-                    weatherData.city.lon.toString()
-            )
-            temperatureValue.text = weatherData.temperature.toString()
-            feelsLikeValue.text = weatherData.feelsLike.toString()
-        }
-    }
-
 }
