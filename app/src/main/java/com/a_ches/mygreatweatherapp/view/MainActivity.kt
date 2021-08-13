@@ -7,7 +7,6 @@ import com.a_ches.mygreatweatherapp.databinding.MainActivityBinding
 
 class MainActivity : AppCompatActivity() {
 
-
     private lateinit var binding: MainActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,7 +17,6 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction()
                     .replace(binding.container.id, MainFragment.newInstance())
                     .commitNow()
-
         }
     }
 }
