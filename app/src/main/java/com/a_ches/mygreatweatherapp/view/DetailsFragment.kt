@@ -1,38 +1,87 @@
 package com.a_ches.mygreatweatherapp.view
 
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.google.gson.Gson
+import com.squareup.picasso.Picasso
+
 import com.a_ches.mygreatweatherapp.R
 import com.a_ches.mygreatweatherapp.databinding.DetailsFragmentBinding
+import com.a_ches.mygreatweatherapp.model.AppState
 import com.a_ches.mygreatweatherapp.model.data.Weather
+
+import com.a_ches.mygreatweatherapp.viewmodel.DetailsViewModel
+import java.io.IOException
+
+private const val TEMP_INVALID = -100
+private const val FEELS_LIKE_INVALID = -100
+private const val PROCESS_ERROR = "Обработка ошибки"
+private const val REQUEST_API_KEY = "X-Yandex-API-Key"
 
 class DetailsFragment : Fragment() {
 
     private var _binding: DetailsFragmentBinding? = null
     private val binding get() = _binding!!
+    private lateinit var weatherBundle: Weather
+
+    private val viewModel: DetailsViewModel by lazy {
+        ViewModelProvider(this).get(DetailsViewModel::class.java)
+    }
 
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = DetailsFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        arguments?.getParcelable<Weather>(BUNDLE_EXTRA)?.let{ weather ->
-            populateData(weather)
+        weatherBundle = arguments?.getParcelable<Weather>(BUNDLE_EXTRA) ?: Weather()
+        viewModel.detailsLiveData.observe(viewLifecycleOwner) { renderData(it) }
+        viewModel.getWeatherFromRemoteSource(weatherBundle.city.lat, weatherBundle.city.lon)
+    }
+
+    private fun renderData(appState: AppState) {
+        when (appState) {
+            is AppState.Success -> {
+                binding.main.show()
+                binding.loadingLayout.hide()
+                setWeather(appState.weatherData[0])
+            }
+            is AppState.Loading -> {
+                binding.main.hide()
+                binding.loadingLayout.show()
+            }
+            is AppState.Error -> {
+                binding.main.show()
+                binding.loadingLayout.hide()
+                binding.main.showSnackBar(getString(R.string.error), getString(R.string.reload)) {
+                    viewModel.getWeatherFromRemoteSource(weatherBundle.city.lat, weatherBundle.city.lon)
+                }
+            }
         }
     }
 
-    private fun populateData(weatherData: Weather) {
+    private fun setWeather(weather: Weather) {
         with(binding) {
-            weatherData.city.also{ city ->
+            weatherBundle.city.let { city ->
                 cityName.text = city.city
                 cityCoordinates.text = String.format(
                         getString(R.string.city_coordinates),
@@ -40,11 +89,15 @@ class DetailsFragment : Fragment() {
                         city.lon.toString()
                 )
             }
-
-            weatherData.apply {
-                temperatureValue.text = temperature.toString()
-                feelsLikeValue.text = feelsLike.toString()
+            weather.let {
+                temperatureValue.text = it.temperature.toString()
+                feelsLikeValue.text = it.feelsLike.toString()
+                weatherCondition.text = it.condition
             }
+            Picasso
+                    .get()
+                    .load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
+                    .into(headerIcon)
         }
     }
 
@@ -57,4 +110,5 @@ class DetailsFragment : Fragment() {
             return fragment
         }
     }
+
 }
