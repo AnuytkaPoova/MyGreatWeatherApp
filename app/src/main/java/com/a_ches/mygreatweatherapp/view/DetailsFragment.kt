@@ -36,6 +36,7 @@ class DetailsFragment : Fragment() {
         ViewModelProvider(this).get(DetailsViewModel::class.java)
     }
 
+
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
