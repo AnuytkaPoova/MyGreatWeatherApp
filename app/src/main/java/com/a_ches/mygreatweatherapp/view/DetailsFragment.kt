@@ -2,24 +2,41 @@ package com.a_ches.mygreatweatherapp.view
 
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.google.gson.Gson
-import com.squareup.picasso.Picasso
+import android.os.Handler
+import android.os.Looper
+
+
+
 
 import com.a_ches.mygreatweatherapp.R
 import com.a_ches.mygreatweatherapp.databinding.DetailsFragmentBinding
-import com.a_ches.mygreatweatherapp.model.AppState
-import com.a_ches.mygreatweatherapp.model.data.Weather
 
-import com.a_ches.mygreatweatherapp.viewmodel.DetailsViewModel
+import com.google.gson.Gson
+import okhttp3.*
+//import ru.geekbrains.androidwithkotlin.BuildConfig
+
+import com.a_ches.mygreatweatherapp.model.data.Weather
 import java.io.IOException
+
+
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import androidx.lifecycle.ViewModelProvider
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.a_ches.mygreatweatherapp.BuildConfig
+import com.a_ches.mygreatweatherapp.model.AppState
+import com.a_ches.mygreatweatherapp.model.dto.FactDTO
+import com.a_ches.mygreatweatherapp.model.dto.WeatherDTO
+import com.a_ches.mygreatweatherapp.viewmodel.DetailsViewModel
+
 
 private const val TEMP_INVALID = -100
 private const val FEELS_LIKE_INVALID = -100
@@ -36,17 +53,21 @@ class DetailsFragment : Fragment() {
         ViewModelProvider(this).get(DetailsViewModel::class.java)
     }
 
+
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View {
         _binding = DetailsFragmentBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
+
     override fun onDestroyView() {
         _binding = null
+
         super.onDestroyView()
     }
 
@@ -94,12 +115,9 @@ class DetailsFragment : Fragment() {
                 feelsLikeValue.text = it.feelsLike.toString()
                 weatherCondition.text = it.condition
             }
-            Picasso
-                    .get()
-                    .load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
-                    .into(headerIcon)
         }
     }
+
 
     companion object {
         const val BUNDLE_EXTRA = "weather"
@@ -110,5 +128,4 @@ class DetailsFragment : Fragment() {
             return fragment
         }
     }
-
 }
