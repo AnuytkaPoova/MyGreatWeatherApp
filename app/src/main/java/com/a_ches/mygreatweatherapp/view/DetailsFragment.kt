@@ -33,6 +33,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.a_ches.mygreatweatherapp.BuildConfig
 import com.a_ches.mygreatweatherapp.model.AppState
+import com.a_ches.mygreatweatherapp.model.data.City
 import com.a_ches.mygreatweatherapp.model.dto.FactDTO
 import com.a_ches.mygreatweatherapp.model.dto.WeatherDTO
 import com.a_ches.mygreatweatherapp.viewmodel.DetailsViewModel
@@ -94,7 +95,10 @@ class DetailsFragment : Fragment() {
                 binding.main.show()
                 binding.loadingLayout.hide()
                 binding.main.showSnackBar(getString(R.string.error), getString(R.string.reload)) {
-                    viewModel.getWeatherFromRemoteSource(weatherBundle.city.lat, weatherBundle.city.lon)
+                    viewModel.getWeatherFromRemoteSource(
+                            weatherBundle.city.lat,
+                            weatherBundle.city.lon
+                    )
                 }
             }
         }
@@ -109,6 +113,7 @@ class DetailsFragment : Fragment() {
                         city.lat.toString(),
                         city.lon.toString()
                 )
+                saveCity(city, weather)
             }
             weather.let {
                 temperatureValue.text = it.temperature.toString()
@@ -118,6 +123,19 @@ class DetailsFragment : Fragment() {
         }
     }
 
+    private fun saveCity(
+            city: City,
+            weather: Weather
+    ) {
+        viewModel.saveCityToDB(
+                Weather(
+                        city,
+                        weather.temperature,
+                        weather.feelsLike,
+                        weather.condition
+                )
+        )
+    }
 
     companion object {
         const val BUNDLE_EXTRA = "weather"

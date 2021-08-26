@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.a_ches.mygreatweatherapp.model.AppState
 import com.a_ches.mygreatweatherapp.model.repository.Repository
 import com.a_ches.mygreatweatherapp.model.repository.RepositoryImpl
+
 import java.lang.Thread.sleep
 
 class MainViewModel(private val repository: Repository = RepositoryImpl()) :

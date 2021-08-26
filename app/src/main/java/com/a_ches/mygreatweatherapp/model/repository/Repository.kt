@@ -8,6 +8,3 @@ interface Repository {
     fun getWeatherFromLocalStorageRus(): List<Weather>
     fun getWeatherFromLocalStorageWorld(): List<Weather>
 }
-
-
-
