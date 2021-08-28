@@ -2,6 +2,9 @@ package com.a_ches.mygreatweatherapp.room
 
 import androidx.room.*
 
+import android.database.Cursor
+import androidx.room.*
+
 @Dao
 interface HistoryDao {
     @Query("SELECT * FROM HistoryEntity")
@@ -18,4 +21,13 @@ interface HistoryDao {
 
     @Delete
     fun delete(entity: HistoryEntity)
+
+    @Query("DELETE FROM HistoryEntity WHERE id = :id")
+    fun deleteById(id: Long)
+
+    @Query("SELECT id, city, temperature FROM HistoryEntity")
+    fun getHistoryCursor(): Cursor
+
+    @Query("SELECT id, city, temperature FROM HistoryEntity WHERE id = :id")
+    fun getHistoryCursor(id: Long): Cursor
 }
