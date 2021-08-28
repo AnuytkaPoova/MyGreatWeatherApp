@@ -1,10 +1,14 @@
 package com.a_ches.mygreatweatherapp.view
 
+
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.a_ches.mygreatweatherapp.databinding.MainRecyclerItemBinding
 import com.a_ches.mygreatweatherapp.model.data.Weather
+
 
 class MainFragmentAdapter :
         RecyclerView.Adapter<MainFragmentAdapter.MainViewHolder>() {
