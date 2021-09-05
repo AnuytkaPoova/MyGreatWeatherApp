@@ -6,7 +6,16 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
+
 android {
+    signingConfigs {
+        my_key {
+            storeFile file('C:\\Users\\a_che\\AndroidStudioProjects\\MyGreatWeatherApp\\app\\key.jks')
+            keyAlias 'key0'
+            storePassword '123456'
+            keyPassword '123456'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
@@ -19,14 +28,33 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.my_key
     }
 
 
     buildTypes {
+
+
         release {
+
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "MY_BUILD_TYPE", "\"RELEASE\"")
         }
+        beta {
+            initWith debug
+            versionNameSuffix "-beta"
+            debuggable true
+            buildConfigField("String", "MY_BUILD_TYPE", "\"BETA\"")
+        }
+        debug {
+            buildConfigField("String", "MY_BUILD_TYPE", "\"DEBUG\"")
+            versionNameSuffix '-debug'
+
+        }
+
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

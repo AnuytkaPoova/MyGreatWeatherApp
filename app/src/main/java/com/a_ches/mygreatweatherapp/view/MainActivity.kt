@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 
 import android.view.Menu
 import android.view.MenuItem
+import androidx.viewbinding.BuildConfig
 import com.a_ches.mygreatweatherapp.R
 import com.a_ches.mygreatweatherapp.databinding.MainActivityBinding
 
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = MainActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        //binding.chip1.text = BuildConfig.
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                     .replace(binding.container.id, MainFragment.newInstance())
