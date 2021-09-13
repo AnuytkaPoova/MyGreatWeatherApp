@@ -2,18 +2,19 @@ package com.a_ches.mygreatweatherapp.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.a_ches.mygreatweatherapp.app.App.Companion.getHistoryDao
+import com.a_ches.mygreatweatherapp.model.AppState
+import com.a_ches.mygreatweatherapp.model.data.Weather
+import com.a_ches.mygreatweatherapp.model.data.convertDtoToModel
+import com.a_ches.mygreatweatherapp.model.dto.FactDTO
+import com.a_ches.mygreatweatherapp.model.dto.WeatherDTO
+import com.a_ches.mygreatweatherapp.model.repository.*
 
 
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import com.a_ches.mygreatweatherapp.model.AppState
-import com.a_ches.mygreatweatherapp.model.data.convertDtoToModel
-import com.a_ches.mygreatweatherapp.model.dto.FactDTO
-import com.a_ches.mygreatweatherapp.model.dto.WeatherDTO
-import com.a_ches.mygreatweatherapp.model.repository.DetailsRepository
-import com.a_ches.mygreatweatherapp.model.repository.DetailsRepositoryImpl
-import com.a_ches.mygreatweatherapp.model.repository.RemoteDataSource
+
 import java.io.IOException
 
 private const val SERVER_ERROR = "Ошибка сервера"
@@ -22,12 +23,16 @@ private const val CORRUPTED_DATA = "Неполные данные"
 
 class DetailsViewModel(
         val detailsLiveData: MutableLiveData<AppState> = MutableLiveData(),
-        private val detailsRepository: DetailsRepository = DetailsRepositoryImpl(RemoteDataSource())
+        private val detailsRepository: DetailsRepository = DetailsRepositoryImpl(RemoteDataSource()),
+        private val historyRepository: LocalRepository = LocalRepositoryImpl(getHistoryDao())
 ) : ViewModel() {
 
     fun getWeatherFromRemoteSource(lat: Double, lon: Double) {
         detailsLiveData.value = AppState.Loading
         detailsRepository.getWeatherDetailsFromServer(lat, lon, callBack)
+    }
+    fun saveCityToDB(weather: Weather) {
+        historyRepository.saveEntity(weather)
     }
 
     private val callBack = object : Callback<WeatherDTO> {
